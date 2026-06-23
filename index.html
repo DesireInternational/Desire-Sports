@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desire Sports — Live TV</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="header">
+  <div class="logo">
+    <div class="logo-mark">📺</div>
+    <div class="logo-name">Desire <em>Sports</em></div>
+  </div>
+  <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+  <div class="hspacer"></div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input id="searchInput" type="text" placeholder="Search channels..." autocomplete="off">
+  </div>
+</header>
+
+<!-- TICKER -->
+<div id="ticker">
+  <div class="ticker-tag">🔴 LIVE NOW</div>
+  <div class="ticker-scroll"><div class="ticker-inner" id="tickerInner"></div></div>
+</div>
+
+<!-- ═══ FEATURED PLAYER (FIFA WORLD CUP PANEL) ═══ -->
+<section id="wc-panel">
+  <div class="wc-header">
+    <div class="wc-title">
+      <span class="wc-trophy">🏆</span>
+      FIFA World Cup 2026™
+      <span class="wc-subtitle">Group Stage — North America</span>
+    </div>
+    <div class="wc-tabs">
+      <button class="wc-tab active" onclick="showWcTab('today')">Today</button>
+      <button class="wc-tab" onclick="showWcTab('tomorrow')">Tomorrow</button>
+      <button class="wc-tab" onclick="showWcTab('upcoming')">Upcoming</button>
+    </div>
+  </div>
+  <div class="wc-matches" id="wc-matches"></div>
+</section>
+
+<!-- ═══ SPORT TABS ═══ -->
+<div id="sport-tabs-bar">
+  <div id="sport-tabs">
+    <button class="sp-tab active" data-cat="all"        onclick="setTab(this)">📺 All</button>
+    <button class="sp-tab" data-cat="football"          onclick="setTab(this)">⚽ Football</button>
+    <button class="sp-tab" data-cat="cricket"           onclick="setTab(this)">🏏 Cricket</button>
+    <button class="sp-tab" data-cat="basketball"        onclick="setTab(this)">🏀 Basketball</button>
+    <button class="sp-tab" data-cat="tennis"            onclick="setTab(this)">🎾 Tennis</button>
+    <button class="sp-tab" data-cat="motorsport"        onclick="setTab(this)">🏎️ Motorsport</button>
+    <button class="sp-tab" data-cat="golf"              onclick="setTab(this)">⛳ Golf</button>
+    <button class="sp-tab" data-cat="boxing"            onclick="setTab(this)">🥊 Boxing</button>
+    <button class="sp-tab" data-cat="rugby"             onclick="setTab(this)">🏉 Rugby</button>
+    <button class="sp-tab" data-cat="baseball"          onclick="setTab(this)">⚾ Baseball</button>
+    <button class="sp-tab" data-cat="hockey"            onclick="setTab(this)">🏒 Hockey</button>
+    <button class="sp-tab" data-cat="americas"          onclick="setTab(this)">🌎 Americas</button>
+    <button class="sp-tab" data-cat="europe"            onclick="setTab(this)">🌍 Europe</button>
+    <button class="sp-tab" data-cat="asia"              onclick="setTab(this)">🌏 Asia</button>
+  </div>
+</div>
+
+<!-- ═══ MAIN GRID ═══ -->
+<main id="main">
+  <div id="statusBar">
+    <div class="spin-sm"></div>
+    <span>Loading sources: <b id="srcLoaded">0</b> / <b id="srcTotal">0</b></span>
+    <div class="prog-track"><div id="progressBar"></div></div>
+    <span id="chanCount">0 channels</span>
+  </div>
+  <div id="channelGrid"></div>
+  <div style="text-align:center;padding:20px 0">
+    <button id="loadMoreBtn">Load More</button>
+  </div>
+</main>
+
+<!-- ═══ PLAYER MODAL ═══ -->
+<div id="playerModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-info">
+        <div id="modalName">Channel</div>
+        <div class="modal-tags">
+          <span class="mtag" id="modalSport"></span>
+          <span class="mtag" id="modalSrc"></span>
+          <span class="mtag mtag-live">● LIVE</span>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closePlayer()">✕</button>
+    </div>
+
+    <!-- VIDEO AREA -->
+    <div class="player-wrap" id="playerWrap">
+
+      <!-- Loading -->
+      <div id="pLoading">
+        <div class="spinner"></div>
+        <p>Connecting to stream…</p>
+      </div>
+
+      <!-- ERROR / VLC FALLBACK -->
+      <div id="pError">
+        <div class="err-screen">
+          <div class="err-icon">📡</div>
+          <h3>Stream blocked in browser</h3>
+          <p>This channel uses a protected or geo-restricted stream.<br>
+             Click <strong>▶ Play in VLC</strong> — it opens automatically.</p>
+          <div class="err-btns">
+            <button id="vlcPlayBtn" class="btn-vlc" onclick="openVLC()">▶ Play in VLC</button>
+            <a id="mxBtn" href="#" class="btn-mx">📱 MX Player</a>
+            <button class="btn-copy-err" onclick="copyUrlErr()">📋 Copy Stream URL</button>
+          </div>
+          <div class="vlc-hint">
+            <strong>How VLC auto-play works:</strong>
+            Your browser will ask to open VLC Media Player. Click <em>Open</em>.
+            VLC must be installed on your device.
+            <a href="https://www.videolan.org/vlc/" target="_blank" rel="noopener" class="vlc-dl-link">Download VLC free →</a>
+          </div>
+          <!-- Embedded VLC iframe fallback attempt -->
+          <iframe id="vlcFrame" src="" style="display:none;width:100%;height:220px;border:none;margin-top:12px;border-radius:8px;background:#000"></iframe>
+        </div>
+      </div>
+
+      <!-- Actual video -->
+      <video id="videoPlayer" controls playsinline></video>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-foot">
+      <div id="streamUrl" class="stream-url-box"></div>
+      <div class="foot-btns">
+        <button class="foot-btn" id="copyUrlBtn" onclick="copyUrl()">📋 Copy URL</button>
+        <button class="foot-btn" onclick="openVLC()">▶ VLC</button>
+        <a id="dlLink" href="#" download class="foot-btn">⬇ Download</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HLS.js -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
